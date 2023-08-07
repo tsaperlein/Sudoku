@@ -36,3 +36,5 @@ if __name__ == "__main__":
             k = puzzle.get_cell_value(i, j)
             sys.stdout.write("%s" % pad(k) + (" " if j < N else ""))
         sys.stdout.write("\n")
+        
+    sys.stdout.write("\n")
