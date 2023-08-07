@@ -26,11 +26,11 @@ while true; do
         echo "$solution"
 
         output_file="${input_file%.in}.out"
-        if [ ! -f "tests/$output_file" ]; then
+        if [ ! -f "tests/outputs/$output_file" ]; then
             echo -e "\nFile $output_file not found, so it is created."
         fi
 
-        echo "$solution" > "tests/$output_file"
+        echo "$solution" > "tests/outputs/$output_file"
         echo -e " "
     fi
 done

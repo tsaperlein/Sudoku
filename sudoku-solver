@@ -2,7 +2,7 @@
 
 import sudoku
 import sys
-
+import time
 
 if __name__ == "__main__":
 
@@ -22,11 +22,17 @@ if __name__ == "__main__":
             k = row[j - 1]
             if k.isdigit():
                 puzzle.set_cell_value(i, j, int(k))
+                
+    start_time = time.time()
 
     # solve the puzzle
     if not puzzle.solve():
         sys.stdout.write("Sudoku puzzle is not valid.\n")
         exit(1)
+        
+    end_time = time.time()
+    
+    assignments = 0
 
     # print the solution
     digits = len(str(N))
@@ -34,7 +40,13 @@ if __name__ == "__main__":
     for i in sudoku.crange(1, N):
         for j in sudoku.crange(1, N):
             k = puzzle.get_cell_value(i, j)
+            assignments += 1
             sys.stdout.write("%s" % pad(k) + (" " if j < N else ""))
         sys.stdout.write("\n")
+        
+    # Print the assignments and the time taken
+
+    print("\nAssignments:", assignments)
+    print("Time elapsed: %.5f sec." % (end_time - start_time))
         
     sys.stdout.write("\n")
