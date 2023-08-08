@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+
+import sudoku
+import sys
+import time
+
+if __name__ == "__main__":
+    
+    # The input before the first "[" is the puzzle and the input after the first "[" are the cages
+    input = sys.stdin.read().split("[")
+
+    # Take the n and m values from the puzzle
+    n, m = map(int, input[0].split("\n")[0].split())
+    
+    cages = []
+    for cage in input[1:]:
+        # add "[" in the beginning of the string
+        cage = "[" + cage
+        cages.append(eval(cage))
+
+    # Initialize the Killer Sudoku solver
+    killer_puzzle = sudoku.Killer_Sudoku(m, n, cages)
+
+    start_time = time.time()
+
+    # Solve the puzzle
+    if not killer_puzzle.solve():
+        sys.stdout.write("Killer Sudoku puzzle is not valid.\n")
+        exit(1)
+
+    end_time = time.time()
+
+    assignments = 0
+
+    # Print the solution
+    digits = len(str(m * n))
+    pad = lambda k: str(k).rjust(digits)
+    for i in sudoku.crange(1, m * n):
+        for j in sudoku.crange(1, m * n):
+            k = killer_puzzle.get_cell_value(i, j)
+            assignments += 1
+            sys.stdout.write("%s" % pad(k) + (" " if j < m * n else ""))
+        sys.stdout.write("\n")
+
+    # Print the assignments and the time taken
+    print("\nAssignments:", assignments)
+    print("Time elapsed: %.5f sec." % (end_time - start_time))
+
+    sys.stdout.write("\n")
