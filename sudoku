@@ -2,10 +2,11 @@
 
 while true; do
     read -p "
-Type one of the following options:
+Select on the following solvers (or 'exit' to quit)):
 - normal: Sudoku
 - ks: Killer Sudoku
-- exit: Exit the script
+- gt: Greater Than Sudoku
+- gtks: Greater Than Killer Sudoku
 
 >>> " solver
 
@@ -24,7 +25,13 @@ Type one of the following options:
 
         input_file="$input_name.in"
 
-        if [ "$solver" = "normal" ]; then
+        if [ "$solver" = "sudoku" ]; then
+            # Check if the sudoku-solver executable exists
+            if [ ! -f sudoku-solver ]; then
+                echo "sudoku-solver executable not found."
+                exit 1
+            fi
+
             if [ ! -f "tests/$input_file" ]; then
                 echo "File $input_file not found."
             else
@@ -47,7 +54,7 @@ Type one of the following options:
             if [ ! -f "tests-ks/$input_file" ]; then
                 echo "File $input_file not found."
             else
-                solution=$(./killer-sudoku-solver < "tests-ks/$input_file")
+                solution=$(./ks-solver < "tests-ks/$input_file")
 
                 echo -e "\n- Running $input_file"
                 echo -e "Solution:"
@@ -59,6 +66,24 @@ Type one of the following options:
                 fi
 
                 echo "$solution" > "tests-ks/outputs/$output_file"
+                echo -e " "
+            fi
+        elif [ "$solver" = "gt" ]; then
+            if [ ! -f "tests-gt/$input_file" ]; then
+                echo "File $input_file not found."
+            else
+                solution=$(./gt-solver < "tests-gt/$input_file")
+
+                echo -e "\n- Running $input_file"
+                echo -e "Solution:"
+                echo "$solution"
+
+                output_file="${input_file%.in}.out"
+                if [ ! -f "tests-gt/outputs/$output_file" ]; then
+                    echo -e "\nFile $output_file not found, so it is created."
+                fi
+
+                echo "$solution" > "tests-gt/outputs/$output_file"
                 echo -e " "
             fi
         else
