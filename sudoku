@@ -1,0 +1,68 @@
+#!/bin/bash
+
+while true; do
+    read -p "
+Type one of the following options:
+- normal: Sudoku
+- ks: Killer Sudoku
+- exit: Exit the script
+
+>>> " solver
+
+    if [ "$solver" = "exit" ]; then
+        echo -e "\nExiting the script!"
+        break
+    fi
+
+    while true; do
+        read -p "Enter the name of a .in file (or 'exit' to select another solver): " input_name
+
+        if [ "$input_name" = "exit" ]; then
+            echo "Exiting the current solver."
+            break
+        fi
+
+        input_file="$input_name.in"
+
+        if [ "$solver" = "normal" ]; then
+            if [ ! -f "tests/$input_file" ]; then
+                echo "File $input_file not found."
+            else
+                solution=$(./sudoku-solver < "tests/$input_file")
+
+                echo -e "\n- Running $input_file"
+                echo -e "Solution:"
+                echo "$solution"
+
+                output_file="${input_file%.in}.out"
+                if [ ! -f "tests/outputs/$output_file" ]; then
+                    echo -e "\nFile $output_file not found, so it is created."
+                fi
+
+                echo "$solution" > "tests/outputs/$output_file"
+                echo -e " "
+            fi
+
+        elif [ "$solver" = "ks" ]; then
+            if [ ! -f "tests-ks/$input_file" ]; then
+                echo "File $input_file not found."
+            else
+                solution=$(./killer-sudoku-solver < "tests-ks/$input_file")
+
+                echo -e "\n- Running $input_file"
+                echo -e "Solution:"
+                echo "$solution"
+
+                output_file="${input_file%.in}.out"
+                if [ ! -f "tests-ks/outputs/$output_file" ]; then
+                    echo -e "\nFile $output_file not found, so it is created."
+                fi
+
+                echo "$solution" > "tests-ks/outputs/$output_file"
+                echo -e " "
+            fi
+        else
+            echo "Invalid input. Try again"
+        fi
+    done
+done

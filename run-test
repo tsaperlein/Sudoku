@@ -13,12 +13,6 @@ while true; do
     if [ ! -f "tests/$input_file" ]; then
         echo "File $input_file not found."
     else
-        # Check if the sudoku-solver executable exists
-        if [ ! -f sudoku-solver ]; then
-            echo "sudoku-solver executable not found."
-            exit 1
-        fi
-
         solution=$(./sudoku-solver < "tests/$input_file")
 
         echo -e "\n- Running $input_file"
