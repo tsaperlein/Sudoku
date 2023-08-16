@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+
+# Example Sudoku puzzle (0 represents empty cells)
+sudoku = [
+    [5, 3, 0, 0, 7, 0, 0, 0, 0],
+    [6, 0, 0, 1, 9, 5, 0, 0, 0],
+    [0, 9, 8, 0, 0, 0, 0, 6, 0],
+    [8, 0, 0, 0, 6, 0, 0, 0, 3],
+    [4, 0, 0, 8, 0, 3, 0, 0, 1],
+    [7, 0, 0, 0, 2, 0, 0, 0, 6],
+    [0, 6, 0, 0, 0, 0, 2, 8, 0],
+    [0, 0, 0, 4, 1, 9, 0, 0, 5],
+    [0, 0, 0, 0, 8, 0, 0, 7, 9]
+]
+
+# Find x-wing pattern in the sudoku
+def find_x_wing(sudoku):
+    # Iterate over all numbers
+    for number in range(1, 10):
+        # Find all rows with two occurrences of the number
+        rows = []
+        for row in range(9):
+            if sudoku[row].count(number) == 2:
+                rows.append(row)
+
+        # Iterate over all rows with two occurrences of the number
+        for row in rows:
+            # Find all columns with two occurrences of the number
+            columns = []
+            for column in range(9):
+                if sudoku[row][column] == number:
+                    columns.append(column)
+
+            # Iterate over all columns with two occurrences of the number
+            for column in columns:
+                # Find all rows with two occurrences of the number
+                rows2 = []
+                for row2 in range(9):
+                    if sudoku[row2][column] == number:
+                        rows2.append(row2)
+
+                # Iterate over all rows with two occurrences of the number
+                for row2 in rows2:
+                    # Find all columns with two occurrences of the number
+                    columns2 = []
+                    for column2 in range(9):
+                        if sudoku[row2][column2] == number:
+                            columns2.append(column2)
+
+                    # Iterate over all columns with two occurrences of the number
+                    for column2 in columns2:
+                        # Check if the rows are the same
+                        if row == row2:
+                            continue
+
+                        # Check if the columns are the same
+                        if column == column2:
+                            continue
+
+                        # Check if the rows are in the same block
+                        if row // 3 != row2 // 3:
+                            continue
+
+                        # Check if the columns are in the same block
+                        if column // 3 != column2 // 3:
+                            continue
+
+                        # Check if the x-wing pattern is valid
+                        if sudoku[row][column2] == 0 and sudoku[row2][column] == 0:
+                            # Print the x-wing pattern
+                            print("X-Wing Pattern: " + str(number) + " in (" + str(row) + ", " + str(column) + ") and (" + str(row2) + ", " + str(column2) + ")")
+                            
