@@ -2,92 +2,143 @@
 
 while true; do
     read -p "
-Select on the following solvers (or 'exit' to quit)):
-- normal: Sudoku
-- ks: Killer Sudoku
-- gt: Greater Than Sudoku
-- gtks: Greater Than Killer Sudoku
+Select solving method:
+- ipl: Integer Linear Programming
+- back: Backtracking
+Or type 'exit' to exit the script.
+>>> " option
 
->>> " solver
-
-    if [ "$solver" = "exit" ]; then
+    if [ "$option" = "exit" ]; then
         echo -e "\nExiting the script!"
         break
+    else
+        if [ "$option" = "ipl" ]; then
+            echo -e "\nUsing Integer Linear Programming solving method..."
+            while true; do
+                read -p "
+  (ILP) Select solver:
+  - normal: Normal Sudoku
+  - ks: Killer Sudoku
+  - gt: Greater Than Sudoku
+  Or type 'exit' to change method. 
+  >>> " solver
+
+                if [ "$solver" = "exit" ]; then
+                    echo "
+  Exiting the current method...
+  "
+                    break
+                else
+                    while true; do
+                        read -p "
+    (ILP/$solver) Enter the name of a .in file (or 'exit' to change solver): 
+    >>> " input_name
+
+                        if [ "$input_name" = "exit" ]; then
+                            echo "
+    Exiting the current solver...
+    "
+                            break
+                        else
+                            input_file="$input_name.in"
+
+                            if [ "$solver" = "normal" ]; then
+
+                                if [ ! -f "tests/$input_file" ]; then
+                                    echo "File $input_file not found."
+                                else
+                                    solution=$(./sudoku-solver < "tests/$input_file")
+
+                                    echo -e "\n- Running $input_file"
+                                    echo -e "Solution:"
+                                    echo "$solution"
+
+                                    output_file="${input_file%.in}.out"
+                                    if [ ! -f "tests/outputs/$output_file" ]; then
+                                        echo -e "\nFile $output_file not found, so it is created."
+                                    fi
+                                    echo "$solution" > "tests/outputs/$output_file"
+                                    echo -e " "
+                                fi
+
+                            elif [ "$solver" = "ks" ]; then
+
+                                if [ ! -f "tests-ks/$input_file" ]; then
+                                    echo "File $input_file not found."
+                                else
+                                    solution=$(./ks-solver < "tests-ks/$input_file")
+
+                                    echo -e "\n- Running $input_file"
+                                    echo -e "Solution:"
+                                    echo "$solution"
+
+                                    output_file="${input_file%.in}.out"
+                                    if [ ! -f "tests-ks/outputs/$output_file" ]; then
+                                        echo -e "\nFile $output_file not found, so it is created."
+                                    fi
+                                    echo "$solution" > "tests-ks/outputs/$output_file"
+                                    echo -e " "
+                                fi
+
+                            elif [ "$solver" = "gt" ]; then
+
+                                if [ ! -f "tests-gt/$input_file" ]; then
+                                    echo "File $input_file not found."
+                                else
+                                    solution=$(./gt-solver < "tests-gt/$input_file")
+
+                                    echo -e "\n- Running $input_file"
+                                    echo -e "Solution:"
+                                    echo "$solution"
+
+                                    output_file="${input_file%.in}.out"
+                                    if [ ! -f "tests-gt/outputs/$output_file" ]; then
+                                        echo -e "\nFile $output_file not found, so it is created."
+                                    fi
+                                    echo "$solution" > "tests-gt/outputs/$output_file"
+                                    echo -e " "
+                                fi
+
+                            else
+                                echo "Invalid input. Try again"
+                            fi
+                        fi
+                    done
+                fi
+            done
+        elif [ "$option" = "back" ]; then
+            echo -e "\nUsing Backtracking solving method..."
+            while true; do
+                read -p "
+    (Backtracking) Enter the name of a .in file (or 'exit' to change solver/method): 
+    >>> " input_name
+
+                if [ "$input_name" = "exit" ]; then
+                    echo "
+    Exiting the current method...
+    "
+                    break
+                else
+                    input_file="$input_name.in"
+
+                    if [ ! -f "tests/$input_file" ]; then
+                        echo "File $input_file not found."
+                    else
+                        solution=$(./backtracking-solver < "tests/$input_file")
+
+                        echo -e "\n- Running $input_file"
+                        echo -e "Solution:"
+                        echo "$solution"
+
+                        output_file="${input_file%.in}_btr.out"
+                        if [ ! -f "tests/outputs/$output_file" ]; then
+                            echo -e "\nFile $output_file not found, so it is created."
+                        fi
+                        echo "$solution" > "tests/outputs/$output_file"
+                        echo -e " "
+                    fi
+                fi
+            done
+        fi
     fi
-
-    while true; do
-        read -p "Enter the name of a .in file (or 'exit' to select another solver): " input_name
-
-        if [ "$input_name" = "exit" ]; then
-            echo "Exiting the current solver."
-            break
-        fi
-
-        input_file="$input_name.in"
-
-        if [ "$solver" = "sudoku" ]; then
-            # Check if the sudoku-solver executable exists
-            if [ ! -f sudoku-solver ]; then
-                echo "sudoku-solver executable not found."
-                exit 1
-            fi
-
-            if [ ! -f "tests/$input_file" ]; then
-                echo "File $input_file not found."
-            else
-                solution=$(./sudoku-solver < "tests/$input_file")
-
-                echo -e "\n- Running $input_file"
-                echo -e "Solution:"
-                echo "$solution"
-
-                output_file="${input_file%.in}.out"
-                if [ ! -f "tests/outputs/$output_file" ]; then
-                    echo -e "\nFile $output_file not found, so it is created."
-                fi
-
-                echo "$solution" > "tests/outputs/$output_file"
-                echo -e " "
-            fi
-
-        elif [ "$solver" = "ks" ]; then
-            if [ ! -f "tests-ks/$input_file" ]; then
-                echo "File $input_file not found."
-            else
-                solution=$(./ks-solver < "tests-ks/$input_file")
-
-                echo -e "\n- Running $input_file"
-                echo -e "Solution:"
-                echo "$solution"
-
-                output_file="${input_file%.in}.out"
-                if [ ! -f "tests-ks/outputs/$output_file" ]; then
-                    echo -e "\nFile $output_file not found, so it is created."
-                fi
-
-                echo "$solution" > "tests-ks/outputs/$output_file"
-                echo -e " "
-            fi
-        elif [ "$solver" = "gt" ]; then
-            if [ ! -f "tests-gt/$input_file" ]; then
-                echo "File $input_file not found."
-            else
-                solution=$(./gt-solver < "tests-gt/$input_file")
-
-                echo -e "\n- Running $input_file"
-                echo -e "Solution:"
-                echo "$solution"
-
-                output_file="${input_file%.in}.out"
-                if [ ! -f "tests-gt/outputs/$output_file" ]; then
-                    echo -e "\nFile $output_file not found, so it is created."
-                fi
-
-                echo "$solution" > "tests-gt/outputs/$output_file"
-                echo -e " "
-            fi
-        else
-            echo "Invalid input. Try again"
-        fi
-    done
 done
