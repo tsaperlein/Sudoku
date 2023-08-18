@@ -164,5 +164,6 @@ class Greater_Than_Sudoku(Sudoku):
             elif type == "eq":
                 # Set the same value for both cells
                 for k in crange(1, self.N):
-                    self.sudoku_model += (self.x[var_name(i1, j1, k)].value() - self.x[var_name(i2, j2, k)].value() = 0)
+                    self.sudoku_model += (self.x[var_name(i1, j1, k)].value() == self.x[var_name(i2, j2, k)].value())
+                
                         
