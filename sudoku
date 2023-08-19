@@ -4,7 +4,7 @@ while true; do
     read -p "
 Select solving method:
 - ipl: Integer Linear Programming
-- back: Backtracking
+- back: Backtracking (10 Helping Methods)
 Or type 'exit' to exit the script.
 >>> " option
 

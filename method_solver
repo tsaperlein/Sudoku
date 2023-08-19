@@ -20,7 +20,6 @@ all_blocks = [[((i//3) * 3 + j//3, (i % 3)*3+j % 3)
 # combine three
 all_houses = all_columns+all_rows+all_blocks
 
-
 # Some helper functions
 #################################################
 # returns list [(0,0), (0,1) .. (a-1,b-1)]
@@ -59,6 +58,15 @@ def n_to_remove(sudoku):
     for (i, j) in range2(9, 9):
         to_remove += len(sudoku[i, j])-1
     return to_remove
+
+# Function that takes the puzzle and returns the number of all the candidates of the empty cells
+def n_candidates(sudoku):
+    candidates = 0
+    for i in range(9):
+        for j in range(9):
+            if len(sudoku[i][j]) > 1:
+                candidates += len(sudoku[i][j])
+    return candidates
 
 
 # Print full sudoku, with all candidates (rather messy)
@@ -828,7 +836,10 @@ def brute_force(s, verbose):
 
     if len(solution)>0:
         if verbose:
-            print ("Backtracking took:", time.time()-t, "seconds, with", iter_counter, "attempts made")
+            print ("Backtracking took:", time.time()-t, "sec., with", iter_counter, "attempts made")
+            global backtracking_used, cells_bt_used
+            backtracking_used = True
+            cells_bt_used = iter_counter
         return solution
 
     # this is only if puzzle is broken and couldn't be forced
@@ -838,6 +849,9 @@ def brute_force(s, verbose):
 
 # Main Solver ---------------------------------------
 def solve(original_puzzle, verbose, all_at_once=False):
+    
+    global backtracking_used
+    backtracking_used = False
 
     report = [0]*10
 
@@ -884,10 +898,11 @@ def solve(original_puzzle, verbose, all_at_once=False):
         if r_step == 0:
             break
 
-    #print_sudoku(puzzle)
     if verbose:
+        global time_elapsed
+        time_elapsed = time.time() - t
         print ("Solved with logic: number of complete cells", solved, "/81. Candidates to remove:", to_remove)
-        print ("Time elapsed:", time.time() - t, "sec.")
+        print ("Time elapsed:", time_elapsed, "sec.")
 
     if to_remove > 0:
         for_brute = n_to_remove(puzzle)
@@ -921,7 +936,7 @@ def line(sol):
         for b in a:
             out += str(b[0])
     # Return a list of m*n strings of length m*n
-    return [out[i:i+m*n] for i in range(0, len(out), m*n)]  
+    return [out[i:i+m*n] for i in range(0, len(out), m*n)]
 
 def read_input():
     # Read only m*n + 1 lines
@@ -950,19 +965,155 @@ def print_board(m, n, board):
                 print("|", end=" ")
             print(board[i][j], end=" ")
         print()
+        
 
+# Function that finds the level of difficulty of the puzzle
+def evaluate_puzzle(puzzle):
+    
+    level_E, level_M, level_H, level_VH = 0, 0, 0, 0
+    
+    # 1. Find the number of empty cells (30% difficulty decider)
+    empty_cells = 0
+    for i in range(len(puzzle)):
+        for j in range(len(puzzle[i])):
+            if puzzle[i][j] == 0:
+                empty_cells += 1
+                
+    # For each option, the respective level is increased by 0.3
+    if empty_cells < 27 and empty_cells > 0: # (81/3)
+        level_E += 0.3
+    elif empty_cells < 40 and empty_cells > 26: # (81/2)
+        level_M += 0.3
+    elif empty_cells < 74 and empty_cells > 39: # (81/1.1)
+        level_H += 0.3
+    else:
+        level_VH += 0.3
+                
+    # 2. Find the number of candidates in the empty cells (after simple elimination) (25% difficulty decider)
+    remaining_candidates = sum([sum(row) for row in count_remaining_candidates(puzzle)])
+    print(remaining_candidates)
+    
+    if remaining_candidates < 100 and remaining_candidates > 0:
+        level_E += 0.25
+    elif remaining_candidates < 170 and remaining_candidates > 99:
+        level_M += 0.25
+    elif remaining_candidates < 220 and remaining_candidates > 169:
+        level_H += 0.25
+    else:
+        level_VH += 0.25
+    
+    # 3. Find the subtraction (candidates - remaining_candidates) (20% difficulty decider)
+    erased_candidates = sum([sum(row) for row in count_candidates(puzzle)]) - remaining_candidates
+    
+    if erased_candidates < 50:
+        level_VH += 0.2
+    elif erased_candidates < 100:
+        level_H += 0.2
+    elif erased_candidates < 200:
+        level_M += 0.2
+    else:
+        level_E += 0.2
+    
+    # 4. Find the time it took to solve the puzzle (15% difficulty decider)
+    if time_elapsed > 0 and time_elapsed < 0.2:
+        level_E += 0.15
+    elif time_elapsed > 0.2 and time_elapsed < 0.6:
+        level_M += 0.15
+    elif time_elapsed > 0.6 and time_elapsed < 1.1:
+        level_H += 0.15
+    elif time_elapsed > 1.1:
+        level_VH += 0.15
+        
+
+    # 5. Find if the computer used backtracking to solve the puzzle and for how many cells (10% difficulty decider)
+    if backtracking_used:
+        if cells_bt_used < 50:
+            level_E += 0.1
+        elif cells_bt_used < 200:
+            level_M += 0.1
+        elif cells_bt_used < 1000:
+            level_H += 0.1
+        else:
+            level_VH += 0.1
+        
+    # Find the maximum level
+    max_level = max(level_E, level_M, level_H, level_VH)
+    
+    # Return the level of difficulty
+    if max_level == level_E:
+        return "Easy"
+    elif max_level == level_M:
+        return "Medium"
+    elif max_level == level_H:
+        return "Hard"
+    else:
+        return "Very Hard"
+    
+    
+# Function that counts the number of candidates in the empty cells
+def count_remaining_candidates(puzzle):
+    # Create a new puzzle to store the count of candidates for each cell
+    candidates_count = [[0 for _ in range(len(puzzle[0]))] for _ in range(len(puzzle))]
+    
+    # Go through all the cells
+    for i in range(len(puzzle)):
+        for j in range(len(puzzle[i])):
+            # If the cell is empty
+            if puzzle[i][j] == 0:
+                # Initialize a set to store candidates
+                candidates = set(range(1, 10))  # Assuming 1 to 9 are the possible candidates
+                
+                # Check candidates in the same row
+                for k in range(len(puzzle[i])):
+                    candidates.discard(puzzle[i][k])
+                
+                # Check candidates in the same column
+                for k in range(len(puzzle)):
+                    candidates.discard(puzzle[k][j])
+                
+                # Check candidates in the same box
+                for k in range(3):
+                    for l in range(3):
+                        box_row = i // 3 * 3 + k
+                        box_col = j // 3 * 3 + l
+                        candidates.discard(puzzle[box_row][box_col])
+                
+                # Store the count of remaining candidates for the cell
+                candidates_count[i][j] = len(candidates)
+    
+    return candidates_count
+
+def count_candidates(puzzle):
+    # Create a new puzzle to store the count of candidates for each cell
+    candidates_count = [[0 for _ in range(len(puzzle[0]))] for _ in range(len(puzzle))]
+    
+    # Go through all the cells
+    for i in range(len(puzzle)):
+        for j in range(len(puzzle[i])):
+            # If the cell is empty
+            if puzzle[i][j] == 0:
+                # Initialize a set to store candidates
+                candidates = set(range(1, 10))  # Assuming 1 to 9 are the possible candidates
+    
+    # Store the count of remaining candidates for the cell
+                candidates_count[i][j] = len(candidates)
+    
+    return candidates_count
 
 if __name__ == "__main__":
     m, n, puzzle = read_input()
     
-    verbose, all_at_once = True, False
+    verbose, all_at_once = True, True
     
     print("\n- Puzzle:")
     print_board(m, n, puzzle)
     print()
     
-    solution = line(solve(np.array(puzzle), verbose, all_at_once)) 
+    solution = line(solve(np.array(puzzle), verbose, all_at_once))
     
     print("- Solution:")
     print_board(m, n, solution)
+    
+    level = evaluate_puzzle(puzzle)
+    print("\nLevel: ", level)
     print()
