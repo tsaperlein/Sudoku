@@ -68,31 +68,6 @@ def n_candidates(sudoku):
                 candidates += len(sudoku[i][j])
     return candidates
 
-
-# Print full sudoku, with all candidates (rather messy)
-def print_sudoku(sudoku):
-    for j in range(9):
-        out_string = "|"
-        out_string2 = " " * 10 + "|"
-        for i in range(9):
-            if len(sudoku[i, j]) == 1:
-                out_string2 += str(sudoku[i, j][0])+" "
-            else:
-                out_string2 += "  "
-
-            for k in range(len(sudoku[i, j])):
-                out_string += str(sudoku[i, j][k])
-            for k in range(10 - len(sudoku[i, j])):
-                out_string += " "
-            if (i + 1) % 3 == 0:
-                out_string += " | "
-                out_string2 += "|"
-
-        if (j) % 3 == 0:
-            print ("-" * 99, " " * 10, "-" * 22)
-        print (out_string, out_string2)
-    print ("-" * 99,  " " * 10, "-" * 22)
-
 ### ------------------ SOLVERS ----------------------------
 # 0. Simple Elimination -----------------------------------
 # If there is one number in cell - remove it from the house
@@ -1103,11 +1078,7 @@ def count_candidates(puzzle):
 if __name__ == "__main__":
     m, n, puzzle = read_input()
     
-    verbose, all_at_once = True, True
-    
-    print("\n- Puzzle:")
-    print_board(m, n, puzzle)
-    print()
+    verbose, all_at_once = True, False
     
     solution = line(solve(np.array(puzzle), verbose, all_at_once))
     

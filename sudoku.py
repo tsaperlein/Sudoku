@@ -135,33 +135,4 @@ class Killer_Sudoku(Sudoku):
 
             for i, j in cage_cells:
                 self.sudoku_model += (pulp.lpSum([self.x[var_name(i, j, k)]
-                                                  for k in crange(1, self.N)]) == 1)
-                
-class Greater_Than_Sudoku(Sudoku):
-    def __init__(self, m, n, gt_constraints):
-        super().__init__(m, n)  # Call the constructor of the base class
-        self.gt_constraints = gt_constraints
-        self.N = self.m * self.n  # Store N as an instance variable in Greater_Than_Sudoku
-        self.add_greater_than_constraints()
-
-    def add_greater_than_constraints(self):
-        for constraint in self.gt_constraints:
-            cells = constraint[0]
-            type = constraint[1]
-            
-            cells = cells.split(',(')
-            cells[1] = "(" + cells[1]
-            
-            # take the character before and after the comma
-            i1 = int(cells[0][1])
-            j1 = int(cells[0][3])
-            i2 = int(cells[1][1])
-            j2 = int(cells[1][3])
-            
-            if type == "gt":
-                for k in crange(1, self.N):
-                    self.sudoku_model += (self.x[var_name(i1, j1, k)].value() - self.x[var_name(i2, j2, k)].value() > 0)
-            elif type == "eq":
-                # Set the same value for both cells
-                for k in crange(1, self.N):
-                    self.sudoku_model += (self.x[var_name(i1, j1, k)].value() == self.x[var_name(i2, j2, k)].value())                  
+                                                  for k in crange(1, self.N)]) == 1)               

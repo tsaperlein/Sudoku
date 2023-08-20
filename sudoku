@@ -4,7 +4,7 @@ while true; do
     read -p "
 Select solving method:
 - ipl: Integer Linear Programming
-- back: Backtracking (10 Helping Methods)
+- method: 10 Different Solving Methods
 Or type 'exit' to exit the script.
 >>> " option
 
@@ -106,11 +106,11 @@ Or type 'exit' to exit the script.
                     done
                 fi
             done
-        elif [ "$option" = "back" ]; then
-            echo -e "\nUsing Backtracking solving method..."
+        elif [ "$option" = "method" ]; then
+            echo -e "\nUsing 10 Different Solving Methods..."
             while true; do
                 read -p "
-    (Backtracking) Enter the name of a .in file (or 'exit' to change solver/method): 
+    (Solving Methods) Enter the name of a 3x3 .in file (or 'exit' to change solver/method): 
     >>> " input_name
 
                 if [ "$input_name" = "exit" ]; then
@@ -124,13 +124,13 @@ Or type 'exit' to exit the script.
                     if [ ! -f "tests/$input_file" ]; then
                         echo "File $input_file not found."
                     else
-                        solution=$(./backtracking-solver < "tests/$input_file")
+                        solution=$(./method-solver < "tests/$input_file")
 
                         echo -e "\n- Running $input_file"
                         echo -e "Solution:"
                         echo "$solution"
 
-                        output_file="${input_file%.in}_btr.out"
+                        output_file="${input_file%.in}_10m.out"
                         if [ ! -f "tests/outputs/$output_file" ]; then
                             echo -e "\nFile $output_file not found, so it is created."
                         fi

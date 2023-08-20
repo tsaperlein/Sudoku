@@ -1,54 +1,114 @@
 #!/usr/bin/env python3
 
-from sudoku import Greater_Than_Sudoku, crange
-import sys
-import time
+def read_input():
+    # Read only m*n + 1 lines
+    m, n = map(int, input().split())
+    
+    # Read the board
+    board = []
+    for i in range(m*n):
+        row = input().split()
+        for j in range(m*n):
+            if row[j] == "_" or row[j] == "0" or row[j] == "." or row[j] == "*" or row[j] == "?":
+                row[j] = 0
+            else:
+                row[j] = int(row[j])
+        board.append(row)
+        
+    # Get the constraints
+    constraints = []
+    # Until you stop reading "[(" in the start of the line, read the constraints      
+    while True:
+        try:
+            line = input()
+            if line.startswith("[("):
+                constraints.append(line)
+        except EOFError:
+            break
+        
+    # Create a list that each item has this format: (i,j)>(k,l) if constraint contains gt, (i,j)=(k,l) if constraint contains eq
+    cons = []
+    for i in range(len(constraints)):
+        if constraints[i].__contains__("eq"):
+            cons.append((constraints[i][2], constraints[i][4], "=", constraints[i][8], constraints[i][10]))
+        elif constraints[i].__contains__("gt"):
+            cons.append((constraints[i][2], constraints[i][4], ">", constraints[i][8], constraints[i][10]))
+    
+    return m, n, board, cons
+
+def is_valid(puzzle, row, col, num, m, n):
+
+    # Check row and column
+    for i in range(m):
+        if puzzle[i][col] == num or puzzle[row][i] == num:
+            return False
+        
+    # Check block
+    block_row = (row // m) * m
+    block_col = (col // n) * n
+    for i in range(block_row, block_row + m):
+        for j in range(block_col, block_col + n):
+            if puzzle[i][j] == num:
+                return False
+
+    return True
+
+def solve(m, n, puzzle, constraints):
+    global counter
+    counter = 0
+    
+    def backtrack(row, col):
+        global counter
+        counter += 1
+        if row == m * n:
+            return True  # All cells are filled successfully
+        if col == m * n:
+            return backtrack(row + 1, 0)
+        
+        if puzzle[row][col] != 0:
+            return backtrack(row, col + 1)
+
+        for num in range(1, m * n + 1):
+            # Check if num is valid in the current cell
+            if is_valid(puzzle, row, col, num, m, n):
+                puzzle[row][col] = num
+                
+                if backtrack(row, col + 1) and satisfies_constraints(puzzle, constraints):
+                    return True
+                
+                puzzle[row][col] = 0  # Backtrack
+        return False
+
+    if backtrack(0, 0):
+        return puzzle
+    else:
+        return None  # No solution
+    
+# Function that checks if all the constraints are satisfied
+def satisfies_constraints(puzzle, constraints):
+    for i in range(len(constraints)):
+        if constraints[i][2] == "=":
+            if puzzle[int(constraints[i][0])][int(constraints[i][1])] != puzzle[int(constraints[i][3])][int(constraints[i][4])] and puzzle[int(constraints[i][0])][int(constraints[i][1])] != 0 and puzzle[int(constraints[i][3])][int(constraints[i][4])] != 0:
+                return False
+        elif constraints[i][2] == ">":
+            if puzzle[int(constraints[i][0])][int(constraints[i][1])] <= puzzle[int(constraints[i][3])][int(constraints[i][4])] and puzzle[int(constraints[i][0])][int(constraints[i][1])] != 0 and puzzle[int(constraints[i][3])][int(constraints[i][4])] != 0:
+                return False
+    return True
+
 
 if __name__ == "__main__":
-    
-    # The input before the first "[" is the puzzle and the input after the first "[" are the cages
-    input = sys.stdin.read().split("[")
-
-    # Take the n and m values from the puzzle
-    n, m = map(int, input[0].split("\n")[0].split())
-    
-    constraints = []
-    for constraint_input in input[1:]:
-        constraint_input = constraint_input.strip()  # Remove leading/trailing spaces
-        if not constraint_input:  # Skip empty lines
-            continue
-        # Clean the input and split the constraint and type
-        constraint = constraint_input.split("],")
-        cells = constraint[0]
-        constraint_type = constraint[1]
-        constraints.append((cells, constraint_type))
-
-    # Initialize the Greater Than Sudoku puzzle
-    gt_puzzle = Greater_Than_Sudoku(m, n, constraints)
-
-    start_time = time.time()
-
-    # Solve the puzzle
-    if not gt_puzzle.solve():
-        sys.stdout.write("Greater Than Sudoku puzzle is not valid.\n")
-        exit(1)
-
-    end_time = time.time()
-
-    assignments = 0
-
-    # Print the solution
-    digits = len(str(m * n))
-    pad = lambda k: str(k).rjust(digits)
-    for i in crange(1, m * n):
-        for j in crange(1, m * n):
-            k = gt_puzzle.get_cell_value(i, j)
-            assignments += 1
-            sys.stdout.write("%s" % pad(k) + (" " if j < m * n else ""))
-        sys.stdout.write("\n")
-
-    # Print the assignments and the time taken
-    print("\nAssignments:", assignments)
-    print("Time elapsed: %.5f sec." % (end_time - start_time))
-
-    sys.stdout.write("\n")
+    m, n, puzzle, constraints = read_input()
+    print("Dimensions:", m, n)
+    print("Board:")
+    for row in puzzle:
+        print(row)
+        
+    solved_puzzle = solve(m, n, puzzle, constraints)
+    if solved_puzzle is None:
+        print("No solution")
+    else:
+        print("Solution:")
+        for row in solved_puzzle:
+            print(row)
+            
+    print("Number of recursive calls:", counter)
