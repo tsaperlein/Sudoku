@@ -35,15 +35,25 @@ if __name__ == "__main__":
     # print the solution
     digits = len(str(N))
     pad = lambda k: str(k).rjust(digits)
-    for i in crange(1, N):
-        for j in crange(1, N):
-            k = puzzle.get_cell_value(i, j)
-            sys.stdout.write("%s" % pad(k) + (" " if j < N else ""))
-        sys.stdout.write("\n")
+    
+    # Only for 3x3 puzzles
+    if m == 3 and n == 3:
+        for i in crange(1, N):
+            for j in crange(1, N):
+                sys.stdout.write(pad(puzzle.get_cell_value(i, j)) + " ")
+                if j % 3 == 0 and j < N:
+                    sys.stdout.write("| ")
+            sys.stdout.write("\n")
+            if i % 3 == 0 and i < N:
+                sys.stdout.write("{}+{}+{}\n".format("-"*6, "-"*7, "-"*6))
+    else:
+        for i in crange(1, N):
+            for j in crange(1, N):
+                k = puzzle.get_cell_value(i, j)
+                sys.stdout.write("%s" % pad(k) + (" " if j < N else ""))
+            sys.stdout.write("\n")  
         
-    # Print the assignments and the time taken
-
-    # print("\nAssignments:", assignments)
-    print("Time elapsed: %.5f sec." % (end_time - start_time))
+    # Print the time taken
+    print("\nTime elapsed: %.5f sec." % (end_time - start_time))
         
     sys.stdout.write("\n")
