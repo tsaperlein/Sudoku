@@ -135,4 +135,27 @@ class Killer_Sudoku(Sudoku):
 
             for i, j in cage_cells:
                 self.sudoku_model += (pulp.lpSum([self.x[var_name(i, j, k)]
-                                                  for k in crange(1, self.N)]) == 1)               
+                                                  for k in crange(1, self.N)]) == 1)   
+                
+class Sudoku_X_Grid(Sudoku):
+    def __init__(self, m, n, cages):
+        super().__init__(m, n)  # Call the constructor of the base class
+        self.N = self.m * self.n  # Store N as an instance variable in Killer_Sudoku
+        self.add_x_grid_constraints()
+        
+    def add_x_grid_constraints(self):
+        for i in crange(1, self.N):
+            for j in crange(1, self.N):
+                if i == j or i + j == self.N + 1:
+                    continue
+                for k in crange(1, self.N):
+                    self.sudoku_model += (self.x[var_name(i, j, k)] == 0)
+    
+class Sudoku_Hypersudoku_Grid(Sudoku):
+    def __init__(self, m, n, cages):
+        super().__init__(m, n)  # Call the constructor of the base class
+        self.N = self.m * self.n  # Store N as an instance variable in Killer_Sudoku
+        self.add_hypersudoku_grid_constraints()
+        
+    def add_hypersudoku_grid_constraints(self):
+        
