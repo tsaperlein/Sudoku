@@ -33,17 +33,26 @@ if __name__ == "__main__":
     assignments = 0
 
     # Print the solution
-    digits = len(str(m * n))
+    digits = len(str(m*n))
     pad = lambda k: str(k).rjust(digits)
-    for i in crange(1, m * n):
-        for j in crange(1, m * n):
-            k = killer_puzzle.get_cell_value(i, j)
-            assignments += 1
-            sys.stdout.write("%s" % pad(k) + (" " if j < m * n else ""))
-        sys.stdout.write("\n")
+    
+    if m == 3 and n == 3:
+        for i in crange(1, m*n):
+            for j in crange(1, m*n):
+                sys.stdout.write(pad(killer_puzzle.get_cell_value(i, j)) + " ")
+                if j % 3 == 0 and j < m*n:
+                    sys.stdout.write("| ")
+            sys.stdout.write("\n")
+            if i % 3 == 0 and i < m*n:
+                sys.stdout.write("{}+{}+{}\n".format("-"*6, "-"*7, "-"*6))
+    else:
+        for i in crange(1, m*n):
+            for j in crange(1, m*n):
+                k = killer_puzzle.get_cell_value(i, j)
+                sys.stdout.write("%s" % pad(k) + (" " if j < m*n else ""))
+            sys.stdout.write("\n") 
 
-    # Print the assignments and the time taken
-    print("\nAssignments:", assignments)
+    # Print the time taken
     print("Time elapsed: %.5f sec." % (end_time - start_time))
 
     sys.stdout.write("\n")

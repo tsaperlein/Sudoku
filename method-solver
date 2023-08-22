@@ -940,7 +940,6 @@ def print_board(m, n, board):
                 print("|", end=" ")
             print(board[i][j], end=" ")
         print()
-        
 
 # Function that finds the level of difficulty of the puzzle
 def evaluate_puzzle(puzzle):
@@ -966,7 +965,6 @@ def evaluate_puzzle(puzzle):
                 
     # 2. Find the number of candidates in the empty cells (after simple elimination) (25% difficulty decider)
     remaining_candidates = sum([sum(row) for row in count_remaining_candidates(puzzle)])
-    print(remaining_candidates)
     
     if remaining_candidates < 100 and remaining_candidates > 0:
         level_E += 0.25
