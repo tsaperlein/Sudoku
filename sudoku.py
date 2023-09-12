@@ -138,7 +138,7 @@ class Killer_Sudoku(Sudoku):
                                                   for k in crange(1, self.N)]) == 1)   
                 
 class X_Sudoku(Sudoku):
-    def __init__(self, m, n, cages):
+    def __init__(self, m, n):
         super().__init__(m, n)  # Call the constructor of the base class
         self.N = self.m * self.n  # Store N as an instance variable in Killer_Sudoku
         self.add_x_sudoku_constraints()

@@ -59,7 +59,7 @@ Or type 'exit' to exit the script.
                                 if [ ! -f "tests-ks/$input_file" ]; then
                                     echo "File $input_file not found."
                                 else
-                                    solution=$(./variation-solvers/killer-sudoku < "tests-ks/$input_file")
+                                    solution=$(./killer-sudoku < "tests-ks/$input_file")
                                     echo "$solution"
                                 fi
 
@@ -67,7 +67,7 @@ Or type 'exit' to exit the script.
                                 if [ ! -f "tests-gt/$input_file" ]; then
                                     echo "File $input_file not found."
                                 else
-                                    solution=$(./variation-solvers/greater-than < "tests-gt/$input_file")
+                                    solution=$(./greater-than < "tests-gt/$input_file")
                                     echo "$solution"
                                 fi
 
@@ -75,15 +75,15 @@ Or type 'exit' to exit the script.
                                 if [ ! -f "tests-hp/$input_file" ]; then
                                     echo "File $input_file not found."
                                 else
-                                    solution=$(./variation-solvers/hyper-sudoku < "tests-hp/$input_file")
+                                    solution=$(./hyper-sudoku < "tests-hp/$input_file")
                                     echo "$solution"
                                 fi
 
-                            elif [ "$solver" = "x-grid" ]; then
-                                if [ ! -f "tests-x-grid/$input_file" ]; then
+                            elif [ "$solver" = "xs" ]; then
+                                if [ ! -f "tests-xs/$input_file" ]; then
                                     echo "File $input_file not found."
                                 else
-                                    solution=$(./variation-solvers/x-sudoku < "tests-x-grid/$input_file")
+                                    solution=$(./x-sudoku < "tests-xs/$input_file")
                                     echo "$solution"
                                 fi
 
