@@ -137,13 +137,13 @@ class Killer_Sudoku(Sudoku):
                 self.sudoku_model += (pulp.lpSum([self.x[var_name(i, j, k)]
                                                   for k in crange(1, self.N)]) == 1)   
                 
-class Sudoku_X_Grid(Sudoku):
+class X_Sudoku(Sudoku):
     def __init__(self, m, n, cages):
         super().__init__(m, n)  # Call the constructor of the base class
         self.N = self.m * self.n  # Store N as an instance variable in Killer_Sudoku
-        self.add_x_grid_constraints()
+        self.add_x_sudoku_constraints()
         
-    def add_x_grid_constraints(self):
+    def add_x_sudoku_constraints(self):
         # The values of each diagonal must be different (from 0 to 9)
         for k in crange(1, self.N):
             self.sudoku_model += (pulp.lpSum([self.x[var_name(i, i, k)]
@@ -158,12 +158,6 @@ class HyperSudoku(Sudoku):
         self.add_hypersudoku_constraints()
         
     def add_hypersudoku_constraints(self):
-        """The 4 cages in a 9x9 puzzle sudoku, should contain all the numbers from 1 to 9
-        The first cage hast the cells (2,2), (2,3), (2,4), (3,2), (3,3), (3,4), (4,2), (4,3), (4,4)
-        The second cage hast the cells (2,6), (2,7), (2,8), (3,6), (3,7), (3,8), (4,6), (4,7), (4,8)
-        The third cage hast the cells (6,2), (6,3), (6,4), (7,2), (7,3), (7,4), (8,2), (8,3), (8,4)
-        The fourth cage hast the cells (6,6), (6,7), (6,8), (7,6), (7,7), (7,8), (8,6), (8,7), (8,8)
-        """
         for k in crange(1, self.N):
             self.sudoku_model += (pulp.lpSum([self.x[var_name(i, j, k)]
                                               for i in crange(2, 4)

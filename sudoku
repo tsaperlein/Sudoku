@@ -20,8 +20,8 @@ Or type 'exit' to exit the script.
   - normal: Normal Sudoku
   - ks: Killer Sudoku
   - gt: Greater Than Sudoku
-  - hp: Hyper Sudoku
-  - x-grid: X-Grid Sudoku
+  - hp: Hyper-Sudoku
+  - xs: X-Sudoku
   Or type 'exit' to change method. 
   >>> " solver
 
@@ -59,7 +59,7 @@ Or type 'exit' to exit the script.
                                 if [ ! -f "tests-ks/$input_file" ]; then
                                     echo "File $input_file not found."
                                 else
-                                    solution=$(./ks-solver < "tests-ks/$input_file")
+                                    solution=$(./variation-solvers/killer-sudoku < "tests-ks/$input_file")
                                     echo "$solution"
                                 fi
 
@@ -67,7 +67,7 @@ Or type 'exit' to exit the script.
                                 if [ ! -f "tests-gt/$input_file" ]; then
                                     echo "File $input_file not found."
                                 else
-                                    solution=$(./gt-solver < "tests-gt/$input_file")
+                                    solution=$(./variation-solvers/greater-than < "tests-gt/$input_file")
                                     echo "$solution"
                                 fi
 
@@ -75,7 +75,15 @@ Or type 'exit' to exit the script.
                                 if [ ! -f "tests-hp/$input_file" ]; then
                                     echo "File $input_file not found."
                                 else
-                                    solution=$(./hyper-solver < "tests-hp/$input_file")
+                                    solution=$(./variation-solvers/hyper-sudoku < "tests-hp/$input_file")
+                                    echo "$solution"
+                                fi
+
+                            elif [ "$solver" = "x-grid" ]; then
+                                if [ ! -f "tests-x-grid/$input_file" ]; then
+                                    echo "File $input_file not found."
+                                else
+                                    solution=$(./variation-solvers/x-sudoku < "tests-x-grid/$input_file")
                                     echo "$solution"
                                 fi
 
@@ -106,8 +114,7 @@ Or type 'exit' to exit the script.
                     else
                         solution=$(./method-solver < "tests/$input_file")
 
-                        echo -e "\n- Running $input_file"
-                        echo -e "Solution:"
+                        echo -e "\n- Running $input_file\n"
                         echo "$solution"
                     fi
                 fi
