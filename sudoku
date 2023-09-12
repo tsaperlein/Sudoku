@@ -20,6 +20,8 @@ Or type 'exit' to exit the script.
   - normal: Normal Sudoku
   - ks: Killer Sudoku
   - gt: Greater Than Sudoku
+  - hp: Hyper Sudoku
+  - x-grid: X-Grid Sudoku
   Or type 'exit' to change method. 
   >>> " solver
 
@@ -42,61 +44,39 @@ Or type 'exit' to exit the script.
                         else
                             input_file="$input_name.in"
 
-                            if [ "$solver" = "normal" ]; then
+                            echo -e "\n- Running $input_file"
+                            echo -e "Solution:"
 
+                            if [ "$solver" = "normal" ]; then
                                 if [ ! -f "tests/$input_file" ]; then
                                     echo "File $input_file not found."
                                 else
                                     solution=$(./sudoku-solver < "tests/$input_file")
-
-                                    echo -e "\n- Running $input_file"
-                                    echo -e "Solution:"
                                     echo "$solution"
-
-                                    output_file="${input_file%.in}.out"
-                                    if [ ! -f "tests/outputs/$output_file" ]; then
-                                        echo -e "\nFile $output_file not found, so it is created."
-                                    fi
-                                    echo "$solution" > "tests/outputs/$output_file"
-                                    echo -e " "
                                 fi
 
                             elif [ "$solver" = "ks" ]; then
-
                                 if [ ! -f "tests-ks/$input_file" ]; then
                                     echo "File $input_file not found."
                                 else
                                     solution=$(./ks-solver < "tests-ks/$input_file")
-
-                                    echo -e "\n- Running $input_file"
-                                    echo -e "Solution:"
                                     echo "$solution"
-
-                                    output_file="${input_file%.in}.out"
-                                    if [ ! -f "tests-ks/outputs/$output_file" ]; then
-                                        echo -e "\nFile $output_file not found, so it is created."
-                                    fi
-                                    echo "$solution" > "tests-ks/outputs/$output_file"
-                                    echo -e " "
                                 fi
 
                             elif [ "$solver" = "gt" ]; then
-
                                 if [ ! -f "tests-gt/$input_file" ]; then
                                     echo "File $input_file not found."
                                 else
                                     solution=$(./gt-solver < "tests-gt/$input_file")
-
-                                    echo -e "\n- Running $input_file"
-                                    echo -e "Solution:"
                                     echo "$solution"
+                                fi
 
-                                    output_file="${input_file%.in}.out"
-                                    if [ ! -f "tests-gt/outputs/$output_file" ]; then
-                                        echo -e "\nFile $output_file not found, so it is created."
-                                    fi
-                                    echo "$solution" > "tests-gt/outputs/$output_file"
-                                    echo -e " "
+                            elif [ "$solver" = "hp" ]; then
+                                if [ ! -f "tests-hp/$input_file" ]; then
+                                    echo "File $input_file not found."
+                                else
+                                    solution=$(./hyper-solver < "tests-hp/$input_file")
+                                    echo "$solution"
                                 fi
 
                             else
@@ -129,13 +109,6 @@ Or type 'exit' to exit the script.
                         echo -e "\n- Running $input_file"
                         echo -e "Solution:"
                         echo "$solution"
-
-                        output_file="${input_file%.in}_10m.out"
-                        if [ ! -f "tests/outputs/$output_file" ]; then
-                            echo -e "\nFile $output_file not found, so it is created."
-                        fi
-                        echo "$solution" > "tests/outputs/$output_file"
-                        echo -e " "
                     fi
                 fi
             done
