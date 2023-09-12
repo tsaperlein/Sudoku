@@ -11,7 +11,6 @@ def crange(a, b):
     return range(a, b + 1)
 
 class Sudoku:
-    
     # Initializes a solver for a Sudoku puzzle with block size m×n.
     def __init__(self, m, n):
         """
@@ -151,13 +150,13 @@ class X_Sudoku(Sudoku):
             self.sudoku_model += (pulp.lpSum([self.x[var_name(i, self.N - i + 1, k)]
                                               for i in crange(1, self.N)]) == 1)
     
-class HyperSudoku(Sudoku):
+class Hyper_Sudoku(Sudoku):
     def __init__(self, m, n):
         super().__init__(m, n)  # Call the constructor of the base class
         self.N = self.m * self.n  # Store N as an instance variable in Killer_Sudoku
-        self.add_hypersudoku_constraints()
+        self.add_hyper_sudoku_constraints()
         
-    def add_hypersudoku_constraints(self):
+    def add_hyper_sudoku_constraints(self):
         for k in crange(1, self.N):
             self.sudoku_model += (pulp.lpSum([self.x[var_name(i, j, k)]
                                               for i in crange(2, 4)
@@ -171,3 +170,30 @@ class HyperSudoku(Sudoku):
             self.sudoku_model += (pulp.lpSum([self.x[var_name(i, j, k)]
                                               for i in crange(6, 8)
                                               for j in crange(6, 8)]) == 1)
+            
+class Four_Pyramids_Sudoku(Sudoku):
+    def __init__(self, m, n):
+        super().__init__(m, n)  # Call the constructor of the base class
+        self.N = self.m * self.n  # Store N as an instance variable in Killer_Sudoku
+        self.add_four_pyramids_sudoku_constraints()
+        
+    def add_four_pyramids_sudoku_constraints(self):
+        for k in crange(1, self.N):
+            self.sudoku_model += (pulp.lpSum([self.x[var_name(i, j, k)]
+                                              for i, j in [(2,1), (3,1), (3,2), (4,1), (4,2), (4,3), (5,1), (5,2), (6,1)]]) == 1)
+            self.sudoku_model += (pulp.lpSum([self.x[var_name(i, j, k)]
+                                              for i, j in [(1,4), (1,5), (2,5), (1,6), (2,6), (3,6), (1,7), (2,7), (1,8)]]) == 1)
+            self.sudoku_model += (pulp.lpSum([self.x[var_name(i, j, k)]
+                                              for i, j in [(9,2), (9,3), (8,3), (9,4), (8,4), (7,4), (9,5), (8,5), (9,6)]]) == 1)
+            self.sudoku_model += (pulp.lpSum([self.x[var_name(i, j, k)]
+                                              for i, j in [(8,9), (7,9), (7,8), (6,9), (6,8), (6,7), (5,9), (5,8), (4,9)]]) == 1)
+            
+class Sandwich_Sudoku(Sudoku):
+    def __init__(self, m, n, constraints):
+        super().__init__(m, n)  # Call the constructor of the base class
+        self.N = self.m * self.n  # Store N as an instance variable in Killer_Sudoku
+        self.constraints = constraints
+        self.add_sandwich_sudoku_constraints()
+        
+    def add_sandwich_sudoku_constraints(self):
+        
