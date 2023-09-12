@@ -196,4 +196,12 @@ class Sandwich_Sudoku(Sudoku):
         self.add_sandwich_sudoku_constraints()
         
     def add_sandwich_sudoku_constraints(self):
+        """The constraints are in the format:
+        ['0', '0', '5', '0', '0', '7', '17', '13', '2']
+        ['2', '11', '16', '20', '35', '6', '4', '2', '4']
+        
+        The first list is for the rows and the second for the columns.
+        
+        Each number in the list is the sum of the numbers that are between the cell with the number 1 and the cell with the number 9.
+        """ 
         

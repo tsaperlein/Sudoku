@@ -23,6 +23,7 @@ Or type 'exit' to exit the script.
   - hp: Hyper-Sudoku
   - xs: X-Sudoku
   - 4p: Four-Pyramids Sudoku
+  - ss: Sandwich Sudoku
   Or type 'exit' to change method. 
   >>> " solver
 
@@ -93,6 +94,14 @@ Or type 'exit' to exit the script.
                                     echo "File $input_file not found."
                                 else
                                     solution=$(./four-pyramids < "tests-4p/$input_file")
+                                    echo "$solution"
+                                fi
+
+                            elif [ "$solver" = "ss" ]; then
+                                if [ ! -f "tests-ss/$input_file" ]; then
+                                    echo "File $input_file not found."
+                                else
+                                    solution=$(./sandwich-sudoku < "tests-ss/$input_file")
                                     echo "$solution"
                                 fi
 
