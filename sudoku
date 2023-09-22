@@ -3,7 +3,7 @@
 while true; do
     read -p "
 Select solving method:
-- ipl: Integer Linear Programming
+- ilp: Integer Linear Programming
 - method: 10 Different Solving Methods
 Or type 'exit' to exit the script.
 >>> " option
@@ -12,7 +12,7 @@ Or type 'exit' to exit the script.
         echo -e "\nExiting the script!"
         break
     else
-        if [ "$option" = "ipl" ]; then
+        if [ "$option" = "ilp" ]; then
             echo -e "\nUsing Integer Linear Programming solving method..."
             while true; do
                 read -p "
