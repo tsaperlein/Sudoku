@@ -1,4 +1,1 @@
-tests/outputs
-tests-ks/outputs
-tests-gt/outputs
-__pycache__/sudoku.cpython-311.pyc
+__pycache__
