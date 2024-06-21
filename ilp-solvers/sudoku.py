@@ -110,6 +110,7 @@ class Sudoku:
     def size(self):
         return self.m * self.n
     
+    
 class Killer_Sudoku(Sudoku):
     def __init__(self, m, n, cages):
         super().__init__(m, n)  # Call the constructor of the base class
@@ -136,6 +137,7 @@ class Killer_Sudoku(Sudoku):
                 self.sudoku_model += (pulp.lpSum([self.x[var_name(i, j, k)]
                                                   for k in crange(1, self.N)]) == 1)   
                 
+
 class Greater_Than_Sudoku(Sudoku):
     def __init__(self, m, n, cages):
         super().__init__(m, n)  # Call the constructor of the base class
@@ -144,11 +146,20 @@ class Greater_Than_Sudoku(Sudoku):
         self.possible_values = {}  # Initialize possible values as a dictionary
 
     def assign_possible_values(self):
+        """
+        Assign initial possible values for each cell in the Sudoku grid.
+        Each cell can initially hold any value from 1 to N.
+        """
         for i in crange(1, self.N):
             for j in crange(1, self.N):
                 self.possible_values[(i, j)] = set(crange(1, self.N))
                 
     def erase_possible_values(self):
+        """
+        Adjust the possible values for each cell based on the greater-than constraints.
+        This function ensures that the values in the pairs of cells defined by the cages
+        satisfy the greater-than relationship.
+        """
         for cage in self.cages:
             i1, j1, i2, j2 = cage
             i1, j1, i2, j2 = int(i1), int(j1), int(i2), int(j2)
@@ -239,6 +250,7 @@ class Hyper_Sudoku(Sudoku):
                                               for i in crange(6, 8)
                                               for j in crange(6, 8)]) == 1)
             
+
 class Four_Pyramids_Sudoku(Sudoku):
     def __init__(self, m, n):
         super().__init__(m, n)  # Call the constructor of the base class
@@ -256,7 +268,18 @@ class Four_Pyramids_Sudoku(Sudoku):
             self.sudoku_model += (pulp.lpSum([self.x[var_name(i, j, k)]
                                               for i, j in [(8,9), (7,9), (7,8), (6,9), (6,8), (6,7), (5,9), (5,8), (4,9)]]) == 1)
             
+
 class Sandwich_Sudoku(Sudoku):
+    """
+    The Sandwich_Sudoku class extends the standard Sudoku puzzle by adding constraints that ensure the sum of the numbers between the digits 1 and 9 in each row and column matches specified values. The class performs this by:
+
+    - Initializing the Sudoku grid. (Αρχικοποίηση)
+    - Retrieving and verifying the positions of 1 and 9. (Βρισκειί/Επιβεβαιώνει τις θέσεις του 1 και 9)
+    - Calculating the sum of digits between 1 and 9. (Βρίσκει τα αθροίσματα)
+    - Ensuring these sums match the provided constraints. (Ελέγχει τους αντίστοιχους περιορισμούς)
+
+    If any of these conditions are not met, the class raises an error, enforcing the sandwich constraints on the puzzle.
+    """
     def __init__(self, m, n, constraints):
         super().__init__(m, n)  # Call the constructor of the base class
         self.N = self.m * self.n  # Store N as an instance variable in Sandwich_Sudoku
@@ -264,47 +287,45 @@ class Sandwich_Sudoku(Sudoku):
         self.add_sandwich_sudoku_constraints()
         
     def add_sandwich_sudoku_constraints(self):
-        """The constraints are in the format:
-        [['0', '0', '5', '0', '0', '7', '17', '13', '2'],
-         ['2', '11', '16', '20', '35', '6', '4', '2', '4']]
-        
-        The first list is for the rows and the second for the columns.
-        
-        Each number in the list is the sum of the numbers that are between the cell with the number 1 and the cell with the number 9.
-        """ 
         for i in range(self.N):
             row_constraint = int(self.constraints[0][i])
             col_constraint = int(self.constraints[1][i])
             
-            # Initialize lists to track the positions of 1 and 9 in each row and column
-            row_1_positions = []
-            row_9_positions = []
-            col_1_positions = []
-            col_9_positions = []
+            # Find the positions of 1 and 9 in each row and column
+            row_1_pos = -1
+            row_9_pos = -1
+            col_1_pos = -1
+            col_9_pos = -1
             
-            # Find the positions of 1 and 9 in each row and column using your decision variables
-            for j in crange(1, self.N):
-                if self.x[var_name(i + 1, j, 1)].value() == 1:
-                    row_1_positions.append(j)
-                elif self.x[var_name(i + 1, j, 9)].value() == 1:
-                    row_9_positions.append(j)
-                
-                if self.x[var_name(j, i + 1, 1)].value() == 1:
-                    col_1_positions.append(j)
-                elif self.x[var_name(j, i + 1, 9)].value() == 1:
-                    col_9_positions.append(j)
+            for j in range(self.N):
+                for k in range(1, self.N + 1):
+                    if self.x[var_name(i + 1, j + 1, k)].value() == 1:
+                        if k == 1:
+                            row_1_pos = j + 1
+                        elif k == 9:
+                            row_9_pos = j + 1
+
+                    if self.x[var_name(j + 1, i + 1, k)].value() == 1:
+                        if k == 1:
+                            col_1_pos = j + 1
+                        elif k == 9:
+                            col_9_pos = j + 1
             
-            # Ensure that there are exactly one 1 and one 9 in each row and column
-            if len(row_1_positions) != 1 or len(row_9_positions) != 1:
+            if row_1_pos == -1 or row_9_pos == -1:
                 raise ValueError(f"Row {i} does not contain exactly one 1 and one 9.")
-            if len(col_1_positions) != 1 or len(col_9_positions) != 1:
+            if col_1_pos == -1 or col_9_pos == -1:
                 raise ValueError(f"Column {i} does not contain exactly one 1 and one 9.")
             
-            # Calculate the sum between 1 and 9 for rows and columns
-            row_sum = sum(int(self.x[var_name(i + 1, j, k)].value()) for j in crange(row_1_positions[0] + 1, row_9_positions[0]) for k in crange(2, 8))
-            col_sum = sum(int(self.x[var_name(j, i + 1, k)].value()) for j in crange(col_1_positions[0] + 1, col_9_positions[0]) for k in crange(2, 8))
+            if row_1_pos < row_9_pos:
+                row_sum = sum(int(self.x[var_name(i + 1, j, k)].value()) for j in range(row_1_pos + 1, row_9_pos) for k in range(2, 9))
+            else:
+                row_sum = sum(int(self.x[var_name(i + 1, j, k)].value()) for j in range(row_9_pos + 1, row_1_pos) for k in range(2, 9))
             
-            # Check if the sums match the constraints
+            if col_1_pos < col_9_pos:
+                col_sum = sum(int(self.x[var_name(j, i + 1, k)].value()) for j in range(col_1_pos + 1, col_9_pos) for k in range(2, 9))
+            else:
+                col_sum = sum(int(self.x[var_name(j, i + 1, k)].value()) for j in range(col_9_pos + 1, col_1_pos) for k in range(2, 9))
+            
             if row_sum != row_constraint:
                 raise ValueError(f"Row {i} constraint violated: Sum between 1 and 9 is not equal to {row_constraint}")
             if col_sum != col_constraint:

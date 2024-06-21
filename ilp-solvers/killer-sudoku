@@ -53,6 +53,6 @@ if __name__ == "__main__":
             sys.stdout.write("\n") 
 
     # Print the time taken
-    print("Time elapsed: %.5f sec." % (end_time - start_time))
+    print("\nTime elapsed: %.5f sec." % (end_time - start_time))
 
     sys.stdout.write("\n")

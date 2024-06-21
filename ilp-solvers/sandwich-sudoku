@@ -73,8 +73,6 @@ if __name__ == "__main__":
 
     end_time = time.time()
 
-    assignments = 0
-
     # Print the solution
     digits = len(str(m*n))
     pad = lambda k: str(k).rjust(digits)

@@ -4,6 +4,16 @@ from sudoku import Greater_Than_Sudoku, crange
 import sys
 import time
 
+def parse_constraints(constraints):
+    cons = []
+    for constraint in constraints:
+        if "gt" in constraint:
+            parts = constraint.split("),(")
+            i1, j1 = map(int, parts[0][2:].split(','))
+            i2, j2 = map(int, parts[1].split(')')[0].split(','))
+            cons.append(((i1, j1), (i2, j2)))
+    return cons
+
 if __name__ == "__main__":
     # Read only m*n + 1 lines
     m, n = map(int, input().split())
@@ -13,36 +23,25 @@ if __name__ == "__main__":
     for i in range(m*n):
         row = input().split()
         for j in range(m*n):
-            if row[j] == "_" or row[j] == "0" or row[j] == "." or row[j] == "*" or row[j] == "?":
-                row[j] = 0
+            if row[j] in ["_", "0", ".", "*", "?"]:
+                row[j] = '_'
             else:
                 row[j] = int(row[j])
         board.append(row)
         
     # Get the constraints
     constraints = []
-    # Until you stop reading "[(" in the start of the line, read the constraints      
     while True:
         try:
-            line = input()
+            line = input().strip()
             if line.startswith("[("):
                 constraints.append(line)
         except EOFError:
             break
-        
-    # Create a list that each item has this format: i,j,k,l (i,j)
-    cons = []
-    for i in range(len(constraints)):
-        if constraints[i].__contains__("gt"):
-            cons.append((constraints[i][2], constraints[i][4], constraints[i][8], constraints[i][10]))
-            
-    greater_than_puzzle = Greater_Than_Sudoku(m, n, cons)
     
-    # Set the values of the board
-    for i in range(m*n):
-        for j in range(m*n):
-            if board[i][j] != 0:
-                greater_than_puzzle.set_cell_value(i+1, j+1, board[i][j])
+    cons = parse_constraints(constraints)
+            
+    greater_than_puzzle = Greater_Than_Sudoku(m, n, board, cons)
     
     start_time = time.time()
     
