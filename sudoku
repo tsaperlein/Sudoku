@@ -1,21 +1,7 @@
 #!/bin/bash
 
-while true; do
-    read -p "
-Select solving method:
-- ilp: Integer Linear Programming
-- method: 10 Different Solving Methods
-Or type 'exit' to exit the script.
->>> " option
-
-    if [ "$option" = "exit" ]; then
-        echo -e "\nExiting the script!"
-        break
-    else
-        if [ "$option" = "ilp" ]; then
-            echo -e "\nUsing Integer Linear Programming solving method..."
-            while true; do
-                read -p "
+show_ilp_solvers() {
+    echo -n "
   (ILP) Select solver:
   - normal: Normal Sudoku
   - ks: Killer Sudoku
@@ -24,119 +10,119 @@ Or type 'exit' to exit the script.
   - xs: X-Sudoku
   - 4p: Four-Pyramids Sudoku
   - ss: Sandwich Sudoku
-  Or type 'exit' to change method. 
-  >>> " solver
+  Or type 'exit' to change method.
+  >>> "
+}
 
-                if [ "$solver" = "exit" ]; then
-                    echo "
-  Exiting the current method...
-  "
-                    break
-                else
-                    while true; do
-                        read -p "
+show_main_menu() {
+    echo -n "
+Select solving method:
+- ilp: Integer Linear Programming
+- method: 10 Different Solving Methods
+Or type 'exit' to exit the script.
+>>> "
+}
+
+solve_ilp() {
+    solver=$1
+    case $solver in
+        normal) exec_file="./ilp-solvers/sudoku-solver" ;;
+        ks) exec_file="./ilp-solvers/killer-sudoku" ;;
+        gt) exec_file="./ilp-solvers/greater-than" ;;
+        hp) exec_file="./ilp-solvers/hyper-sudoku" ;;
+        xs) exec_file="./ilp-solvers/x-sudoku" ;;
+        4p) exec_file="./ilp-solvers/four-pyramids" ;;
+        ss) exec_file="./ilp-solvers/sandwich-sudoku" ;;
+        *) echo "Invalid solver. Try again."; return 1 ;;
+    esac
+
+    while true; do
+        read -p "
     (ILP/$solver) Enter the name of a .in file (or 'exit' to change solver): 
     >>> " input_name
 
-                        if [ "$input_name" = "exit" ]; then
-                            echo "
+        if [ "$input_name" = "exit" ]; then
+            echo "
     Exiting the current solver...
     "
-                            break
-                        else
-                            input_file="$input_name.in"
+            break
+        else
+            case $solver in
+                normal) test_folder="tests" ;;
+                ks) test_folder="tests-ks" ;;
+                gt) test_folder="tests-gt" ;;
+                hp) test_folder="tests-hp" ;;
+                xs) test_folder="tests-xs" ;;
+                4p) test_folder="tests-4p" ;;
+                ss) test_folder="tests-ss" ;;
+                *) echo "Invalid solver. Try again."; continue ;;
+            esac
 
-                            echo -e "\n- Running $input_file"
-                            echo -e "Solution:"
+            input_file="$test_folder/$input_name.in"
 
-                            if [ "$solver" = "normal" ]; then
-                                if [ ! -f "tests/$input_file" ]; then
-                                    echo "File $input_file not found."
-                                else
-                                    solution=$(./sudoku-solver < "tests/$input_file")
-                                    echo "$solution"
-                                fi
+            if [ ! -f "$input_file" ]; then
+                echo "File $input_file not found."
+            else
+                echo -e "\n- Running $input_file"
+                echo -e "Solution:"
+                solution=$($exec_file < "$input_file")
+                echo "$solution"
+            fi
+        fi
+    done
+}
 
-                            elif [ "$solver" = "ks" ]; then
-                                if [ ! -f "tests-ks/$input_file" ]; then
-                                    echo "File $input_file not found."
-                                else
-                                    solution=$(./killer-sudoku < "tests-ks/$input_file")
-                                    echo "$solution"
-                                fi
-
-                            elif [ "$solver" = "gt" ]; then
-                                if [ ! -f "tests-gt/$input_file" ]; then
-                                    echo "File $input_file not found."
-                                else
-                                    solution=$(./greater-than < "tests-gt/$input_file")
-                                    echo "$solution"
-                                fi
-
-                            elif [ "$solver" = "hp" ]; then
-                                if [ ! -f "tests-hp/$input_file" ]; then
-                                    echo "File $input_file not found."
-                                else
-                                    solution=$(./hyper-sudoku < "tests-hp/$input_file")
-                                    echo "$solution"
-                                fi
-
-                            elif [ "$solver" = "xs" ]; then
-                                if [ ! -f "tests-xs/$input_file" ]; then
-                                    echo "File $input_file not found."
-                                else
-                                    solution=$(./x-sudoku < "tests-xs/$input_file")
-                                    echo "$solution"
-                                fi
-
-                            elif [ "$solver" = "4p" ]; then
-                                if [ ! -f "tests-4p/$input_file" ]; then
-                                    echo "File $input_file not found."
-                                else
-                                    solution=$(./four-pyramids < "tests-4p/$input_file")
-                                    echo "$solution"
-                                fi
-
-                            elif [ "$solver" = "ss" ]; then
-                                if [ ! -f "tests-ss/$input_file" ]; then
-                                    echo "File $input_file not found."
-                                else
-                                    solution=$(./sandwich-sudoku < "tests-ss/$input_file")
-                                    echo "$solution"
-                                fi
-
-                            else
-                                echo "Invalid input. Try again"
-                            fi
-                        fi
-                    done
-                fi
-            done
-        elif [ "$option" = "method" ]; then
-            echo -e "\nUsing 10 Different Solving Methods..."
-            while true; do
-                read -p "
+solve_method() {
+    while true; do
+        read -p "
     (Solving Methods) Enter the name of a 3x3 .in file (or 'exit' to change solver/method): 
     >>> " input_name
 
-                if [ "$input_name" = "exit" ]; then
-                    echo "
+        if [ "$input_name" = "exit" ]; then
+            echo "
     Exiting the current method...
     "
-                    break
-                else
-                    input_file="$input_name.in"
+            break
+        else
+            input_file="tests/$input_name.in"
 
-                    if [ ! -f "tests/$input_file" ]; then
-                        echo "File $input_file not found."
-                    else
-                        solution=$(./method-solver < "tests/$input_file")
-
-                        echo -e "\n- Running $input_file\n"
-                        echo "$solution"
-                    fi
-                fi
-            done
+            if [ ! -f "$input_file" ]; then
+                echo "File $input_file not found."
+            else
+                echo -e "\n- Running $input_file\n"
+                solution=$(./method-solver < "$input_file")
+                echo "$solution"
+            fi
         fi
+    done
+}
+
+while true; do
+    show_main_menu
+    read -p "" option
+
+    if [ "$option" = "exit" ]; then
+        echo -e "\nExiting the script!"
+        break
+    elif [ "$option" = "ilp" ]; then
+        echo -e "\nUsing Integer Linear Programming solving method..."
+        while true; do
+            show_ilp_solvers
+            read -p "" solver
+
+            if [ "$solver" = "exit" ]; then
+                echo "
+  Exiting the current method...
+  "
+                break
+            else
+                solve_ilp "$solver"
+            fi
+        done
+    elif [ "$option" = "method" ]; then
+        echo -e "\nUsing 10 Different Solving Methods..."
+        solve_method
+    else
+        echo "Invalid input. Try again."
     fi
 done
