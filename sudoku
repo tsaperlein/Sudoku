@@ -90,7 +90,7 @@ solve_method() {
                 echo "File $input_file not found."
             else
                 echo -e "\n- Running $input_file\n"
-                solution=$(./method-solver < "$input_file")
+                solution=$(./ilp-solvers/method-solver < "$input_file")
                 echo "$solution"
             fi
         fi
